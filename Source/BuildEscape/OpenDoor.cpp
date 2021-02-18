@@ -7,7 +7,7 @@
 #include "GameFramework/PlayerController.h"
 
 
-// Sets default values for this component's properties this is a change hello my name is jeff hi test101 test?
+// Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
