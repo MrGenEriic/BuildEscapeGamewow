@@ -16,6 +16,7 @@ class BUILDESCAPE_API UTheGrabber : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UTheGrabber();
+	
 
 public:	
 	// Called every frame
@@ -36,6 +37,8 @@ private:
 	void Release();
 	void FindPhysicsHandle();
 	void GrabFunction();
+	FVector LineTraceEndCalc() const; // Calculates the line for the players object they are picking up
+	FVector PlayerLocation() const; // Gets players world position
 	FHitResult GetPhysicsBodyForGrab() const;
 
 		

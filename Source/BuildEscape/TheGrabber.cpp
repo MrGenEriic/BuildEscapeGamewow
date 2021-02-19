@@ -59,10 +59,9 @@ void UTheGrabber::FindPhysicsHandle()
 	}
 }
 
-
-void UTheGrabber::Grab()
+FVector UTheGrabber::LineTraceEndCalc() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Grabber: Pressed"));
+	//UE_LOG(LogTemp, Warning, TEXT("Grabber: Pressed"));
 	FVector PlayerViewPointLocation;
 	FRotator PlayerViewPointRotation;
 
@@ -72,7 +71,29 @@ void UTheGrabber::Grab()
 		);
 
 	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+	return LineTraceEnd;
+}
 
+
+FVector UTheGrabber::PlayerLocation() const
+{
+
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld() -> GetFirstPlayerController() -> GetPlayerViewPoint(
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotation
+	);
+
+	return PlayerViewPointLocation;
+
+
+}
+
+
+void UTheGrabber::Grab()
+{
 
 	FHitResult HitResult = GetPhysicsBodyForGrab();
 	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
@@ -80,7 +101,7 @@ void UTheGrabber::Grab()
 
 	if (HitResult.GetActor())
 	{
-		PhysicsHandle -> GrabComponentAtLocation(ComponentToGrab, NAME_None, LineTraceEnd);
+		PhysicsHandle -> GrabComponentAtLocation(ComponentToGrab, NAME_None, LineTraceEndCalc());
 	}
 		
 
@@ -89,7 +110,7 @@ void UTheGrabber::Grab()
 
 void UTheGrabber::Release()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Grabber: Released"));
+	//UE_LOG(LogTemp, Warning, TEXT("Grabber: Released"));
 	// Release Physics Handle
 	PhysicsHandle -> ReleaseComponent();
 
@@ -103,19 +124,11 @@ void UTheGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
 
-	GetWorld() -> GetFirstPlayerController() -> GetPlayerViewPoint(
-		OUT PlayerViewPointLocation, 
-		OUT PlayerViewPointRotation
-		);
-
-	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
 
 	if (PhysicsHandle -> GrabbedComponent)
 	{
-		PhysicsHandle -> SetTargetLocation(LineTraceEnd);
+		PhysicsHandle -> SetTargetLocation(LineTraceEndCalc());
 	}
 	
 
@@ -126,15 +139,7 @@ void UTheGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 
 FHitResult UTheGrabber::GetPhysicsBodyForGrab() const
 {
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
 
-	GetWorld() -> GetFirstPlayerController() -> GetPlayerViewPoint(
-		OUT PlayerViewPointLocation, 
-		OUT PlayerViewPointRotation
-		);
-
-	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
 	//FRotator(Reach,0.f,0.f)
 
 	FHitResult ObjectHit;
@@ -142,8 +147,8 @@ FHitResult UTheGrabber::GetPhysicsBodyForGrab() const
 
 	GetWorld() -> LineTraceSingleByObjectType(
 		OUT ObjectHit,
-		PlayerViewPointLocation,
-		LineTraceEnd,
+		PlayerLocation(),
+		LineTraceEndCalc(),
 		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 		TraceParams
 	);
