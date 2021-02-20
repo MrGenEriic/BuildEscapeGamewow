@@ -30,7 +30,11 @@ protected:
 private:
 
 	float Reach = 200.f;
+
+	UPROPERTY() // Unreal documentation says to add this, so a "macro can clean things up" TBD wtf that means but let's add it for now
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
+	
+	UPROPERTY()
 	UInputComponent* InputComponent = nullptr;
 
 	void Grab();

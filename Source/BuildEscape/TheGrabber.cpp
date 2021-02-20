@@ -49,14 +49,11 @@ void UTheGrabber::FindPhysicsHandle()
 {
 	PhysicsHandle = GetOwner() -> FindComponentByClass<UPhysicsHandleComponent>();
 
-	if (PhysicsHandle)
-	{
-		// Doing nothing, if it exists then no need for anything to happen this is simply error logging to easily find which ones don't have it attached
-	}
-	else
+	if (PhysicsHandle == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Error No Physics Handle Component Found on %s"), *GetOwner() -> GetName());
 	}
+
 }
 
 FVector UTheGrabber::LineTraceEndCalc() const
@@ -96,11 +93,13 @@ void UTheGrabber::Grab()
 {
 
 	FHitResult HitResult = GetPhysicsBodyForGrab();
-	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent(); // No need for nullprt since it is being assigned to something else
+	AActor* ActorHit = HitResult.GetActor();
 	// Attach Physics Handle (if we hit something)
 
-	if (HitResult.GetActor())
+	if (ActorHit)
 	{
+		if(!PhysicsHandle) {return;} // Removes nullprt errors, since if the Physics handle doesn't exist but we continue down the pointer line wack errors will be thrown because its pointing from something that doesn't exist
 		PhysicsHandle -> GrabComponentAtLocation(ComponentToGrab, NAME_None, LineTraceEndCalc());
 	}
 		
@@ -112,7 +111,8 @@ void UTheGrabber::Release()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Grabber: Released"));
 	// Release Physics Handle
-	PhysicsHandle -> ReleaseComponent();
+	if(!PhysicsHandle) {return;} // Removes nullprt errors, since if the Physics handle doesn't exist but we continue down the pointer line wack errors will be thrown because its pointing from something that doesn't exist
+	PhysicsHandle -> ReleaseComponent(); // Without the above fix, if we didn't have a Physics handle for the component and tried to release it, could cash a crash since nothing to release
 
 	
 }
@@ -125,7 +125,7 @@ void UTheGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 
-
+	if(!PhysicsHandle) {return;} // This will take us out of the tick function completely
 	if (PhysicsHandle -> GrabbedComponent)
 	{
 		PhysicsHandle -> SetTargetLocation(LineTraceEndCalc());
@@ -145,6 +145,8 @@ FHitResult UTheGrabber::GetPhysicsBodyForGrab() const
 	FHitResult ObjectHit;
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
 
+
+	// No need for a pointer protection here, if the object doesn't have a world with this pointer we have bigger issues xD  Unlike the above ones where it could very possible happen without major components of game not existing
 	GetWorld() -> LineTraceSingleByObjectType(
 		OUT ObjectHit,
 		PlayerLocation(),
