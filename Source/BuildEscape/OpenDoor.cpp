@@ -31,7 +31,6 @@ void UOpenDoor::BeginPlay()
 	CurrentYaw = InitialYaw;
 	TargetYaw += InitialYaw; // Same as TargetYaw = TargetYaw + InitialYaw.  Target Yaw has the value of 90 in the header file so adds it to itself plus the initial yaw
 
-
 	ActorThatOpens = GetWorld() -> GetFirstPlayerController() -> GetPawn(); // Not currently being used, was being used in the IF statement to determine if the door should open when the Actor is on it
 
 	FindAudioComponent();
@@ -93,10 +92,20 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 void UOpenDoor::OpenDoor(float DeltaTime)
 {
+	
+
 	CurrentYaw = FMath::FInterpTo(CurrentYaw, TargetYaw, DeltaTime, 2.0f);
 	FRotator DoorRotation = GetOwner() -> GetActorRotation();
 	DoorRotation.Yaw = CurrentYaw;
 	GetOwner() -> SetActorRotation(DoorRotation);
+
+
+	
+	//CurrentYaw = FMath::FInterpTo(CurrentYaw, TargetYaw, DeltaTime, 2.0f);
+	//FRotator DoorRotation = GetOwner() -> GetActorRotation();
+	//DoorRotation.Yaw = CurrentYaw;
+	//GetOwner() -> SetActorRotation(DoorRotation);
+	
 
 
 
@@ -110,6 +119,8 @@ void UOpenDoor::OpenDoor(float DeltaTime)
 
 	OpenDoorSoundPlayed = true;
 
+
+	//UE_LOG(LogTemp, Warning, TEXT("This Door Name is %s"), *GetOwner() -> GetName())
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *GetOwner() -> GetActorRotation().ToString());
 	//UE_LOG(LogTemp, Warning, TEXT("%f"), GetOwner() -> GetActorRotation().Yaw);
 	//float CurrentYaw = GetOwner() -> GetActorRotation().Yaw;

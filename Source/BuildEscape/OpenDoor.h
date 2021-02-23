@@ -45,7 +45,8 @@ float ClosedYaw;
 float CurrentClosedYaw;
 
 UPROPERTY(EditAnywhere)
-float TargetYaw = 90.0f;
+float TargetYaw = -90.0f;
+
 
 UPROPERTY(EditAnywhere)
 ATriggerVolume* PressurePlate = nullptr;
